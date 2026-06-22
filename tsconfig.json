@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    // Cible moderne et support des modules ES
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    
+    // Options strictes pour un meilleur typage
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Configuration des décorateurs (optionnel, utile plus tard)
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    
+    // Où sont les sources et où va la compilation
+    "rootDir": "./src",
+    "outDir": "./dist",
+    
+    // Résolution des chemins
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
