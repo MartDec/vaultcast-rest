@@ -2,7 +2,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import dotenv from 'dotenv';
-import { connectDatabase } from './config/database.js';
+import { connectDatabase } from './db/lib/sequelize';
+import { performMigrations } from './db/index';
 // import { userRoutes } from './routes/users.js';
 
 dotenv.config();
@@ -40,6 +41,7 @@ fastify.setErrorHandler((error, request, reply) => {
 const start = async () => {
   try {
     await connectDatabase();
+    await performMigrations();
     const port = parseInt(process.env.PORT || '3000');
     await fastify.listen({ port, host: '0.0.0.0' });
     console.log(`🚀 Server running on http://localhost:${port}`);
