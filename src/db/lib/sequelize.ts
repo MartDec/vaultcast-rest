@@ -1,17 +1,7 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import { Options, Sequelize, Transaction } from "sequelize";
+import config from '../config_db';
 
-dotenv.config();
-
-const sequelize = new Sequelize({
-  dialect: 'postgres',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  logging: process.env.NODE_ENV === 'development' ? console.log : false,
-});
+const sequelize = new Sequelize(config as Options);
 
 export const connectDatabase = async () => {
   try {
@@ -25,6 +15,6 @@ export const connectDatabase = async () => {
     console.error('❌ Unable to connect to the database:', error);
     process.exit(1);
   }
-};
+}
 
-export default sequelize;
+export { sequelize, Sequelize };

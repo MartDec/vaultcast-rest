@@ -2,14 +2,16 @@
   "compilerOptions": {
     // Cible moderne et support des modules ES
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "es2022",
+    "moduleResolution": "bundler",
     
     // Options strictes pour un meilleur typage
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "removeComments": true,
     
     // Configuration des décorateurs (optionnel, utile plus tard)
     "experimentalDecorators": true,
