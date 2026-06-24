@@ -9,6 +9,10 @@ export default {
     jwtSecret: process.env.JWT_SECRET,
   },
 
+  security: {
+    saltRound: 12,
+  },
+
   db: {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

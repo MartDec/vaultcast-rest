@@ -1,8 +1,9 @@
 import { validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
-import Fastify from 'fastify';
+import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
-import jwt from '@fastify/jwt'
+import jwt from '@fastify/jwt';
+import cookie from '@fastify/cookie';
 import dotenv from 'dotenv';
 import { connectDatabase } from './db/lib/sequelize';
 import { performMigrations } from './db/index';
@@ -23,7 +24,24 @@ fastify.setSerializerCompiler(() => {
 // Middlewares
 await fastify.register(cors, { origin: true });
 await fastify.register(helmet);
-await fastify.register(jwt, { secret: config.session.jwtSecret });
+await fastify.register(cookie);
+// @ts-ignore
+await fastify.register(jwt, {
+  secret: config.session.jwtSecret,
+  cookie: {
+    cookieName: 'token',
+    signed: false,
+  },
+});
+
+fastify.decorate("authenticate", async function(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const verified = await request.jwtVerify({ onlyCookie: true, maxAge: '1h' });
+      console.log(verified);
+    } catch (err) {
+      reply.send(err);
+    }
+  })
 
 // Routes
 await fastify.register(userRoutes, { prefix : '/api' });

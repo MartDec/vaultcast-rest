@@ -7,3 +7,10 @@ export const registerValidator = z.object({
 });
 
 export type RegisterInput = z.infer<typeof registerValidator>;
+
+export const loginValidator = z.object({
+  email: z.string(),
+  password: z.string(),
+});
+
+export type LoginInput = z.infer<typeof loginValidator>;
