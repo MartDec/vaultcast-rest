@@ -1,26 +1,32 @@
+import { validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import dotenv from 'dotenv';
 import { connectDatabase } from './db/lib/sequelize';
 import { performMigrations } from './db/index';
-// import { userRoutes } from './routes/users.js';
+import userRoutes from './routes/users';
 
 dotenv.config();
 
 // Création de l'instance Fastify
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
+}).withTypeProvider<ZodTypeProvider>();
+
+fastify.setValidatorCompiler(validatorCompiler);
+fastify.setSerializerCompiler(() => {
+  return data => JSON.stringify(data);
 });
 
 // Middlewares globaux
 await fastify.register(cors, {
-  origin: true, // À configurer selon tes besoins
+  origin: true,
 });
 await fastify.register(helmet);
 
 // Routes
-// await fastify.register(userRoutes, { prefix: '/api/users' });
+await fastify.register(userRoutes, { prefix : '/api' });
 
 // Route de santé
 fastify.get('/health', async () => {
@@ -28,13 +34,21 @@ fastify.get('/health', async () => {
 });
 
 // Gestionnaire d'erreurs global
-fastify.setErrorHandler((error, request, reply) => {
+fastify.setErrorHandler((error: any, _request, reply) => {
   fastify.log.error(error);
   reply.status(500).send({ 
     error: 'Internal server error',
-    // @ts-ignore
     message: process.env.NODE_ENV === 'development' ? error.message : undefined
   });
+});
+
+// graceful shutdown
+const listeners = ['SIGINT', 'SIGTERM']
+listeners.forEach((signal) => {
+  process.on(signal, async () => {
+    await fastify.close()
+    process.exit(0)
+  })
 });
 
 // Démarrage du serveur
