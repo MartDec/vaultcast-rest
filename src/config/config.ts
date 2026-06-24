@@ -5,6 +5,10 @@ const Booleans = [true, 1, '1', 'true', 'True', 'TRUE'];
 const isTrue = (variable: string | undefined) => Booleans.includes(variable || 'false');
 
 export default {
+  session: {
+    jwtSecret: process.env.JWT_SECRET,
+  },
+
   db: {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

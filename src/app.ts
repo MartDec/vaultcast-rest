@@ -2,14 +2,15 @@ import { validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
+import jwt from '@fastify/jwt'
 import dotenv from 'dotenv';
 import { connectDatabase } from './db/lib/sequelize';
 import { performMigrations } from './db/index';
 import userRoutes from './routes/users';
+import config from './config/config';
 
 dotenv.config();
 
-// Création de l'instance Fastify
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
 }).withTypeProvider<ZodTypeProvider>();
@@ -19,21 +20,15 @@ fastify.setSerializerCompiler(() => {
   return data => JSON.stringify(data);
 });
 
-// Middlewares globaux
-await fastify.register(cors, {
-  origin: true,
-});
+// Middlewares
+await fastify.register(cors, { origin: true });
 await fastify.register(helmet);
+await fastify.register(jwt, { secret: config.session.jwtSecret });
 
 // Routes
 await fastify.register(userRoutes, { prefix : '/api' });
 
-// Route de santé
-fastify.get('/health', async () => {
-  return { status: 'ok', timestamp: new Date().toISOString() };
-});
-
-// Gestionnaire d'erreurs global
+// Global error handling
 fastify.setErrorHandler((error: any, _request, reply) => {
   fastify.log.error(error);
   reply.status(500).send({ 
@@ -51,7 +46,6 @@ listeners.forEach((signal) => {
   })
 });
 
-// Démarrage du serveur
 const start = async () => {
   try {
     await connectDatabase();
